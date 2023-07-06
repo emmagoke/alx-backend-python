@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This script contains an annotated python script that take stakes
+This script contains an annotated python function that take takes
 takes a float n as argument and returns the string representation of the float
 """
 
