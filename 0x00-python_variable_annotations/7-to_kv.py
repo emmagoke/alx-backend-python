@@ -12,4 +12,4 @@ from typing import Union, Tuple
 def to_kv(k: str, v: Union[int, float]) -> Tuple[str, float]:
     """ This function takes a str and a int or float and returns a tuple"""
     v_sq = v ** 2
-    return (k, v_sq)
+    return (k, float(v_sq))
