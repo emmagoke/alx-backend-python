@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This script contains annotated python function that take takes
+This script contains annotated python function that takes
 takes a float n as argument and returns the string representation of the float
 """
 
