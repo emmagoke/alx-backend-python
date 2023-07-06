@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """
+This script contains an Annoted function that takes
+an tuple and int and returns a List
 """
-from typing import Tuple, List
+from typing import Any, Tuple, List
 
 
 def zoom_array(lst: Tuple, factor: int = 2) -> List:
-    zoomed_in: List = [
+    """ This function takes a tuple and an int. """
+    zoomed_in: List[Any] = [
         item for item in lst
         for i in range(factor)
     ]
