@@ -23,3 +23,18 @@ def connect_db():
     except mysql.connector.Error as err:
         print(f"Error: '{err}'")
         return db_connection
+
+
+def create_database(connection):
+    """
+    This function takes the connection and
+    creates creates the database ALX_prodev if it does not exist
+    """
+    DB_NAME = "ALX_prodev"
+    try:
+        cursor = connection.cursor()
+        cursor.execute(
+            "CREATE DATABASE IF NOT EXISTS {}".format(DB_NAME)
+            )
+    except mysql.connector.Error as err:
+        print(f"Error: '{err}'")
