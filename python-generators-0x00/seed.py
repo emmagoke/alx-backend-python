@@ -57,3 +57,40 @@ def connect_to_prodev():
     except mysql.connector.Error as err:
         print(f"Error: '{err}'")
         return db_connection
+
+
+def create_table(connection):
+    """
+    This function creates the table user_data if it does not exist
+    with the required fields
+    """
+    TABLE_COMMAND = """
+        CREATE TABLE IF NOT EXISTS user_data (
+        user_id CHAR(36) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        age DECIMAL NOT NULL 
+        );
+    """
+    #  age DECIMAL(3, 0) NOT NULL can 
+
+    CREATE_INDEX_SQL = """
+        CREATE INDEX idx_users_user_id ON user_data (user_id)
+    """
+    try:
+        cursor = connection.cursor()
+        # cursor.execute("DROP TABLE IF EXISTS user_data")
+        print("Executing: CREATE TABLE IF NOT EXISTS user_data...")
+        cursor.execute(TABLE_COMMAND)
+        print("Table 'user_data' statement executed.")
+
+        print("Executing: CREATE INDEX IF NOT EXISTS idx_users_user_id...")
+        cursor.execute(CREATE_INDEX_SQL)
+        print("Index 'idx_users_user_id' statement executed.")
+        connection.commit()
+        print("Table user_data created successfully")
+        # cursor.close()
+        
+    except mysql.connector.Error as err:
+        print(f"Error: '{err}'")
+        connection.rollback()
