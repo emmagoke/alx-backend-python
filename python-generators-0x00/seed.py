@@ -38,3 +38,22 @@ def create_database(connection):
             )
     except mysql.connector.Error as err:
         print(f"Error: '{err}'")
+
+
+def connect_to_prodev():
+    """
+    This function connects to the ALX_prodev database
+    """
+    db_connection = None
+    try:
+        db_connection = mysql.connector.connect(
+            user="user",
+            password="password",
+            host="host",
+            port="port",
+            database="ALX_prodev"
+        )
+        return db_connection
+    except mysql.connector.Error as err:
+        print(f"Error: '{err}'")
+        return db_connection
