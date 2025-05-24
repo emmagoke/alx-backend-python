@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This script contains an asynchronous generator
+This script database connection functions
 """
 import mysql.connector
 from uuid import uuid4
