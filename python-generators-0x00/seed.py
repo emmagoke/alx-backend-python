@@ -94,3 +94,47 @@ def create_table(connection):
     except mysql.connector.Error as err:
         print(f"Error: '{err}'")
         connection.rollback()
+
+
+def insert_data(connection, data):
+    """
+    This function inserts data into the user_data table
+    if it does not exist
+    """
+    try:
+        cursor = connection.cursor()
+        with open(data, 'r') as f:
+            reader = csv.DictReader(f)  # or csv.DictReader(f)
+            # csv.reader(f) return ['name', 'email', 'age'], ['Johnnie Mayer', 'Ross.Reynolds21@hotmail.com', '35']
+            # csv.DictReader(f) returns {'name': 'Johnnie Mayer', 'email': 'Ross.Reynolds21@hotmail.com', 'age': '35'}
+            print("Inserting user data...")
+            skipped_count = 0
+            for row in reader:
+                user_id = str(uuid4())
+                name = row['name']
+                email = row['email']
+                age = row['age']
+                sql = """
+                INSERT INTO user_data (user_id, name, email, age)
+                VALUES (%s, %s, %s, %s);
+                """
+
+                # Basic validation for presence of essential data
+                if name is None or email is None or age is None:
+                    print(f"Warning: Row {row} has missing name, email, or age: {row}. Skipping.")
+                    skipped_count += 1
+                    continue
+                try:
+                    age = int(age)
+                except ValueError:
+                    age = random.randint(1, 60)
+                cursor.execute(
+                    sql, (user_id, name, email, age)
+                )
+        connection.commit()
+        print("{} rows skipped".format(skipped_count))
+        print("Successfully inserted user data")
+        # cursor.close()
+    except mysql.connector.Error as err:
+        print(f"Error: '{err}'")
+        connection.rollback()
