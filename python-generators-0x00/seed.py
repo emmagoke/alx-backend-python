@@ -3,6 +3,9 @@
 This script contains an asynchronous generator
 """
 import mysql.connector
+from uuid import uuid4
+import csv
+import random
 
 
 def connect_db():
