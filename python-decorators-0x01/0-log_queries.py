@@ -2,6 +2,7 @@
 """
 This script contains a decorator to log SQL queries
 """
+import sqlite3
 import functools
 from datetime import datetime
 
@@ -38,7 +39,7 @@ def log_queries(func):
                 pass
 
         if sql_query_to_log:
-            print(f"LOG: Executing query: {sql_query_to_log}")
+            print(f"LOG: Executing query: {sql_query_to_log} at {datetime.now(datetime.timezone.utc)}")
         else:
             func_name = func.__name__
             try:
@@ -55,3 +56,16 @@ def log_queries(func):
         result = func(*args, **kwargs)
         return result
     return wrapper
+
+
+@log_queries
+def fetch_all_users(query):
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    cursor.execute(query)
+    results = cursor.fetchall()
+    conn.close()
+    return results
+
+#### fetch users while logging the query
+users = fetch_all_users(query="SELECT * FROM users")
