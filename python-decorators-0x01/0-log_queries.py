@@ -3,6 +3,7 @@
 This script contains a decorator to log SQL queries
 """
 import functools
+from datetime import datetime
 
 
 def log_queries(func):
