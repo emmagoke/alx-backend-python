@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied, NotFound
 from django.db.models import Prefetch
 import uuid
+from rest_framework import filters
 
 
 from .models import Conversation, Message, User
@@ -16,6 +17,7 @@ class ConversationViewSet(viewsets.ViewSet):
     """
     serializer_class = ChatConversationSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.OrderingFilter]
 
     def get_serializer_context(self):
         """
@@ -65,6 +67,7 @@ class MessageViewSet(viewsets.ViewSet):
     """
     serializer_class = ChatMessageSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.OrderingFilter]
 
     def get_serializer_context(self):
         """
