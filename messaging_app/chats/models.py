@@ -33,6 +33,11 @@ class User(AbstractUser):
       username, password, email, first_name,
       last_name, date_joined, last_login,
     """
+    user_id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
     ROLE_GUEST = 'guest'
     ROLE_HOST = 'host'
     ROLE_ADMIN = 'admin'
