@@ -81,7 +81,10 @@ class ChatConversationSerializer(serializers.ModelSerializer):
         write_only=True,
         label="Participant User IDs"
     )
-    latest_message = ChatMessageSerializer(read_only=True) # Use the new ChatMessageSerializer
+    # latest_message = ChatMessageSerializer(read_only=True)
+
+    display_name = serializers.CharField(source='__str__', read_only=True)
+    conversation_type = serializers.SerializerMethodField()
 
     class Meta:
         model = Conversation
@@ -94,6 +97,15 @@ class ChatConversationSerializer(serializers.ModelSerializer):
             'latest_message',
         )
         read_only_fields = ('conversation_id', 'created_at', 'updated_at', 'latest_message')
+    
+    def get_conversation_type(self, obj: Conversation):
+        if obj.participants.count() == 2:
+            # Check if one of the participants is the current user (if context is available)
+            # For simplicity, just returning "1-on-1"
+            return "1-on-1 Chat"
+        elif obj.participants.count() > 2:
+            return "Group Chat"
+        return "Unknown"
     
     def create(self, validated_data):
         participant_uuids = validated_data.pop('participants')
