@@ -72,13 +72,18 @@ class User(AbstractUser):
         return self.username
 
 
-class Conversation(BaseUUIDModel, Timestamp):
+class Conversation(Timestamp):
     """
     Represents a conversation involving a set of users.
     In a system with direct sender/recipient messages (as per DBML),
     a Conversation can group participants for a chat thread.
     Messages are not directly foreign-keyed to this model if following the DBML message table strictly.
     """
+    conversation_id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
     participants = models.ManyToManyField(
         User,
         related_name='conversations',
@@ -100,12 +105,12 @@ class Conversation(BaseUUIDModel, Timestamp):
         verbose_name = "Conversation"
         verbose_name_plural = "Conversations"
 
-class Message(BaseUUIDModel):
+class Message(models.Model):
     """
     Represents a single message sent from one user to another.
     This model is based on the DBML 'message' table structure.
     """
-    # message_id UUID [primary key] from DBML is Django's auto 'id' field.
+    message_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # sender_id from DBML
     sender = models.ForeignKey(
         User,
@@ -132,7 +137,7 @@ class Message(BaseUUIDModel):
         verbose_name="Content"
     )
 
-    timestamp = models.DateTimeField(auto_now_add=True)
+    sent_at = models.DateTimeField(auto_now_add=True)
     
     # is_read indicates if the message has been read by recipients
     # This might need more complex logic for group chats
@@ -144,11 +149,11 @@ class Message(BaseUUIDModel):
         return f"Message from {self.sender.username} to {self.recipient.username} at {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
 
     class Meta:
-        ordering = ['timestamp'] # Order messages by when they were sent
+        ordering = ['sent_at'] # Order messages by when they were sent
         verbose_name = "Message"
         verbose_name_plural = "Messages"
         indexes = [
-            models.Index(fields=['timestamp']), # Supports default ordering and range queries
+            models.Index(fields=['sent_at']), # Supports default ordering and range queries
             # The FK 'conversation' already gets an index. If you also query
             # often by 'sender' AND 'timestamp' together, you could consider:
             # models.Index(fields=['sender', 'timestamp']),
