@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth.hashers import make_password
 
 from .models import Message, Conversation, User
 
@@ -35,9 +36,9 @@ class ChatMessageSerializer(serializers.ModelSerializer):
     Reflects direct link to Conversation and UUID keys.
     """
     sender = UserSerializer(read_only=True)
-    sender_id = serializers.UUIDField(
-        source="sender", write_only=True, required=True
-    )
+    # sender_id = serializers.UUIDField(
+    #     source="sender", write_only=True, required=True
+    # )
     conversation_id = serializers.UUIDField(
         source="conversation", write_only=True, required=True
     )
@@ -59,7 +60,10 @@ class ChatMessageSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Automatically set sender from request if not provided in payload
         # and if the serializer is initialized with request context.
-        request_user = self.context.get('request', {}).get('user') if self.context.get('request') else None
+        request = self.context.get('request')
+        
+        # Get the user from the request object using attribute access (request.user)
+        request_user = request.user if request else None
 
         sender_uuid = validated_data.pop('sender_id', None)
 
@@ -73,8 +77,8 @@ class ChatMessageSerializer(serializers.ModelSerializer):
         else: # If not set by context or payload, and sender is required
              raise serializers.ValidationError({"sender_id": "Sender is required and could not be determined."})
 
-
-        conversation_uuid = validated_data.pop('conversation_id')
+        # print("Valid: ", validated_data)
+        conversation_uuid = validated_data.pop('conversation')
         try:
             validated_data['conversation'] = Conversation.objects.get(conversation_id=conversation_uuid)
         except Conversation.DoesNotExist:
@@ -126,7 +130,12 @@ class ChatConversationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         participant_uuids = validated_data.pop('participants')
         # Ensure current user from context is added to participants if not already present
-        request_user = self.context.get('request', {}).get('user') if self.context.get('request') else None
+        # Safely get the request object from the context dictionary.
+        request = self.context.get('request')
+        
+        # Get the user from the request object using attribute access (request.user)
+        request_user = request.user if request else None
+
         if request_user and request_user.is_authenticated:
             if request_user.user_id not in participant_uuids:
                 participant_uuids.append(request_user.user_id) # Add current user if not listed
