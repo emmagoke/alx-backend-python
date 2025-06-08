@@ -100,12 +100,26 @@ class MessageViewSet(viewsets.ViewSet):
     serializer_class = ChatMessageSerializer
     permission_classes = [permissions.IsAuthenticated, IsParticipantOfConversation]
     filter_backends = [filters.OrderingFilter]
+    pagination_class = MessagePagination
 
     def get_serializer_context(self):
         """
         Pass request object to serializer context.
         """
         return {'request': self.request, 'format': self.format_kwarg, 'view': self}
+    
+    @property
+    def paginator(self):
+        """
+        The paginator instance associated with the view, or `None`.
+        """
+        # print(self.__dict__)
+        if not hasattr(self, '_paginator'):
+            if self.pagination_class is None:
+                self._paginator = None
+            else:
+                self._paginator = self.pagination_class()
+        return self._paginator
 
     def get_serializer(self, *args, **kwargs):
         """
