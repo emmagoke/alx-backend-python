@@ -1,0 +1,598 @@
+{
+	"info": {
+		"_postman_id": "ed64db18-7bef-4110-b79b-3b6e93784187",
+		"name": "ALX Messaging App",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31009444"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.environment.set(\"token\", jsonData.access);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "goke",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local_url}}/api/auth/login/",
+							"host": [
+								"{{local_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Conversation",
+			"item": [
+				{
+					"name": "Create A New Conversation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ5NDE4ODMwLCJpYXQiOjE3NDk0MTUyMzAsImp0aSI6IjA3MjRkOWEwM2FmNjQ0NmQ4YjRkMzUzMjQwZjgxYmU0IiwidXNlcl9pZCI6Ijc4YzA0ZDcxLWNhNDMtNDVhMS1iNDQxLTdjOWQ0ODk4NjMyMyIsImVtYWlsIjoiZW1tYS5nb2tlMDVAZ21haWwuY29tIiwiZmlyc3RfbmFtZSI6IiIsImxhc3RfbmFtZSI6IiJ9.k-4SAqwQLAVzN3eR3NZjBNujIlBIhJTN_ddymEyg8P4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"participant_ids\": [\r\n        \"78c04d71-ca43-45a1-b441-7c9d48986323\",\r\n        \"d615bb0e-12dd-4c2d-8cc0-1ddc12bba677\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local_url}}/api/conversations/",
+							"host": [
+								"{{local_url}}"
+							],
+							"path": [
+								"api",
+								"conversations",
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"participant_ids\": [\r\n        \"78c04d71-ca43-45a1-b441-7c9d48986323\",\r\n        \"d615bb0e-12dd-4c2d-8cc0-1ddc12bba677\"\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{local_url}}/api/conversations/",
+									"host": [
+										"{{local_url}}"
+									],
+									"path": [
+										"api",
+										"conversations",
+										""
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 08 Jun 2025 20:46:15 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.11.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "580"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"conversation_id\": \"ccfc1d89-96a2-4d1d-bc78-f1cdeb6e1fe6\",\n    \"participants\": [\n        {\n            \"user_id\": \"78c04d71-ca43-45a1-b441-7c9d48986323\",\n            \"username\": \"goke\",\n            \"email\": \"emma.goke05@gmail.com\",\n            \"first_name\": \"\",\n            \"last_name\": \"\",\n            \"role\": \"admin\",\n            \"phone_number\": null\n        },\n        {\n            \"user_id\": \"d615bb0e-12dd-4c2d-8cc0-1ddc12bba677\",\n            \"username\": \"emma\",\n            \"email\": \"goke.emma05@gmail.com\",\n            \"first_name\": \"\",\n            \"last_name\": \"\",\n            \"role\": \"guest\",\n            \"phone_number\": null\n        }\n    ],\n    \"created_at\": \"2025-06-08T20:46:15.426219Z\",\n    \"updated_at\": \"2025-06-08T20:46:15.426219Z\",\n    \"display_name\": \"Conversation involving goke, emma\",\n    \"conversation_type\": \"1-on-1 Chat\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Message",
+			"item": [
+				{
+					"name": "Create A Message",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ5NDE4ODMwLCJpYXQiOjE3NDk0MTUyMzAsImp0aSI6IjA3MjRkOWEwM2FmNjQ0NmQ4YjRkMzUzMjQwZjgxYmU0IiwidXNlcl9pZCI6Ijc4YzA0ZDcxLWNhNDMtNDVhMS1iNDQxLTdjOWQ0ODk4NjMyMyIsImVtYWlsIjoiZW1tYS5nb2tlMDVAZ21haWwuY29tIiwiZmlyc3RfbmFtZSI6IiIsImxhc3RfbmFtZSI6IiJ9.k-4SAqwQLAVzN3eR3NZjBNujIlBIhJTN_ddymEyg8P4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n}"
+						},
+						"url": {
+							"raw": "{{local_url}}/api/messages/",
+							"host": [
+								"{{local_url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"sender_id\": \"78c04d71-ca43-45a1-b441-7c9d48986323\",\r\n    \"conversation_id\": \"ccfc1d89-96a2-4d1d-bc78-f1cdeb6e1fe6\",\r\n    \"content\": \"Hello Everyone\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{local_url}}/api/messages/",
+									"host": [
+										"{{local_url}}"
+									],
+									"path": [
+										"api",
+										"messages",
+										""
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 08 Jun 2025 21:07:52 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.11.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "417"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message_id\": \"782fb204-85a3-4e8a-8320-c406b201a26c\",\n    \"sender\": {\n        \"user_id\": \"78c04d71-ca43-45a1-b441-7c9d48986323\",\n        \"username\": \"goke\",\n        \"email\": \"emma.goke05@gmail.com\",\n        \"first_name\": \"\",\n        \"last_name\": \"\",\n        \"role\": \"admin\",\n        \"phone_number\": null\n    },\n    \"sender_id\": \"78c04d71-ca43-45a1-b441-7c9d48986323\",\n    \"conversation\": \"ccfc1d89-96a2-4d1d-bc78-f1cdeb6e1fe6\",\n    \"content\": \"Hello Everyone\",\n    \"sent_at\": \"2025-06-08T21:07:52.292840Z\",\n    \"is_read\": false\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Messages Of A Conversation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ5NDE4ODMwLCJpYXQiOjE3NDk0MTUyMzAsImp0aSI6IjA3MjRkOWEwM2FmNjQ0NmQ4YjRkMzUzMjQwZjgxYmU0IiwidXNlcl9pZCI6Ijc4YzA0ZDcxLWNhNDMtNDVhMS1iNDQxLTdjOWQ0ODk4NjMyMyIsImVtYWlsIjoiZW1tYS5nb2tlMDVAZ21haWwuY29tIiwiZmlyc3RfbmFtZSI6IiIsImxhc3RfbmFtZSI6IiJ9.k-4SAqwQLAVzN3eR3NZjBNujIlBIhJTN_ddymEyg8P4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{local_url}}/api/messages?conversation_id=ccfc1d89-96a2-4d1d-bc78-f1cdeb6e1fe6",
+							"host": [
+								"{{local_url}}"
+							],
+							"path": [
+								"api",
+								"messages"
+							],
+							"query": [
+								{
+									"key": "conversation_id",
+									"value": "ccfc1d89-96a2-4d1d-bc78-f1cdeb6e1fe6"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local_url}}/api/messages?conversation_id=ccfc1d89-96a2-4d1d-bc78-f1cdeb6e1fe6",
+									"host": [
+										"{{local_url}}"
+									],
+									"path": [
+										"api",
+										"messages"
+									],
+									"query": [
+										{
+											"key": "conversation_id",
+											"value": "ccfc1d89-96a2-4d1d-bc78-f1cdeb6e1fe6"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 08 Jun 2025 21:09:27 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.11.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "419"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"message_id\": \"782fb204-85a3-4e8a-8320-c406b201a26c\",\n        \"sender\": {\n            \"user_id\": \"78c04d71-ca43-45a1-b441-7c9d48986323\",\n            \"username\": \"goke\",\n            \"email\": \"emma.goke05@gmail.com\",\n            \"first_name\": \"\",\n            \"last_name\": \"\",\n            \"role\": \"admin\",\n            \"phone_number\": null\n        },\n        \"sender_id\": \"78c04d71-ca43-45a1-b441-7c9d48986323\",\n        \"conversation\": \"ccfc1d89-96a2-4d1d-bc78-f1cdeb6e1fe6\",\n        \"content\": \"Hello Everyone\",\n        \"sent_at\": \"2025-06-08T21:07:52.292840Z\",\n        \"is_read\": false\n    }\n]"
+						},
+						{
+							"name": "Success With Pagination",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local_url}}/api/messages?conversation_id=ccfc1d89-96a2-4d1d-bc78-f1cdeb6e1fe6&page=1",
+									"host": [
+										"{{local_url}}"
+									],
+									"path": [
+										"api",
+										"messages"
+									],
+									"query": [
+										{
+											"key": "conversation_id",
+											"value": "ccfc1d89-96a2-4d1d-bc78-f1cdeb6e1fe6"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "page_size",
+											"value": "10",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 08 Jun 2025 21:59:23 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.11.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "892"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"count\": 2,\n    \"next\": null,\n    \"previous\": null,\n    \"results\": [\n        {\n            \"message_id\": \"07b5df5d-202e-4ea3-9bf7-43c7cc46d69c\",\n            \"sender\": {\n                \"user_id\": \"78c04d71-ca43-45a1-b441-7c9d48986323\",\n                \"username\": \"goke\",\n                \"email\": \"emma.goke05@gmail.com\",\n                \"first_name\": \"\",\n                \"last_name\": \"\",\n                \"role\": \"admin\",\n                \"phone_number\": null\n            },\n            \"sender_id\": \"78c04d71-ca43-45a1-b441-7c9d48986323\",\n            \"conversation\": \"ccfc1d89-96a2-4d1d-bc78-f1cdeb6e1fe6\",\n            \"content\": \"I hope we are okay?\",\n            \"sent_at\": \"2025-06-08T21:09:53.984690Z\",\n            \"is_read\": false\n        },\n        {\n            \"message_id\": \"782fb204-85a3-4e8a-8320-c406b201a26c\",\n            \"sender\": {\n                \"user_id\": \"78c04d71-ca43-45a1-b441-7c9d48986323\",\n                \"username\": \"goke\",\n                \"email\": \"emma.goke05@gmail.com\",\n                \"first_name\": \"\",\n                \"last_name\": \"\",\n                \"role\": \"admin\",\n                \"phone_number\": null\n            },\n            \"sender_id\": \"78c04d71-ca43-45a1-b441-7c9d48986323\",\n            \"conversation\": \"ccfc1d89-96a2-4d1d-bc78-f1cdeb6e1fe6\",\n            \"content\": \"Hello Everyone\",\n            \"sent_at\": \"2025-06-08T21:07:52.292840Z\",\n            \"is_read\": false\n        }\n    ]\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Create Users",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"emma\",\r\n    \"email\": \"goke.emma05@gmail.com\",\r\n    \"password\": \"12345678\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local_url}}/api/users/",
+							"host": [
+								"{{local_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"emma\",\r\n    \"email\": \"goke.emma05@gmail.com\",\r\n    \"password\": \"12345678\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{local_url}}/api/users/",
+									"host": [
+										"{{local_url}}"
+									],
+									"path": [
+										"api",
+										"users",
+										""
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sun, 08 Jun 2025 20:39:30 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.11.3"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, Cookie"
+								},
+								{
+									"key": "Allow",
+									"value": "GET, POST, HEAD, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "213"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"user_id\": \"d615bb0e-12dd-4c2d-8cc0-1ddc12bba677\",\n        \"username\": \"emma\",\n        \"email\": \"goke.emma05@gmail.com\",\n        \"first_name\": \"\",\n        \"last_name\": \"\",\n        \"role\": \"guest\",\n        \"phone_number\": null\n    },\n    \"message\": \"User created successfully\"\n}"
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "local_url",
+			"value": "http://127.0.0.1:8000",
+			"type": "default"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
