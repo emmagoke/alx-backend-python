@@ -56,7 +56,6 @@ class User(AbstractUser):
         max_length=20,  # Adjust max_length as needed
         blank=True,     # Corresponds to [null] in DBML
         null=True,
-        verbose_name="Phone Number"
         unique=True,  # Assuming phone numbers are unique
     )
 
