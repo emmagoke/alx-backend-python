@@ -135,30 +135,30 @@ class MessageViewSet(viewsets.ViewSet):
         provided as a query parameter 'conversation_id'.
         The user must be a participant of the conversation.
         """
-        user = request.user
         conversation_id_str = request.query_params.get('conversation_id')
 
         if not conversation_id_str:
-            return Response({"detail": "conversation_id query parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "conversation_id query parameter is required."},
+                status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            conversation_uuid = uuid.UUID(conversation_id_str)
-        except ValueError:
-            return Response({"detail": "Invalid conversation_id format."}, status=status.HTTP_400_BAD_REQUEST)
+        # The permission class already handles checking if the user can access this.
+        # We can safely filter the messages.
+        queryset = Message.objects.filter(
+            conversation_id=conversation_id_str
+        ).select_related('sender').order_by('-sent_at') # Order by -sent_at for latest first
 
-        # Check if the conversation exists and the user is a participant
-        try:
-            conversation = Conversation.objects.get(conversation_id=conversation_uuid)
-            if user not in conversation.participants.all():
-                raise PermissionDenied("You are not a participant in this conversation.")
-        except Conversation.DoesNotExist:
-            raise NotFound("Conversation not found.")
-        
-        queryset = Message.objects.filter(conversation=conversation).select_related(
-            'sender', 'conversation' # Optimize queries
-        ).order_by('sent_at')
-        
-        serializer = self.get_serializer(queryset, many=True)
+        # 1. Manually paginate the queryset
+        page = self.paginator.paginate_queryset(queryset, request, view=self)
+
+        # 2. If paginate_queryset returns a page, serialize and return it
+        if page is not None:
+            serializer = self.serializer_class(page, many=True)
+            # Use the paginator's get_paginated_response method to build the final response
+            return self.paginator.get_paginated_response(serializer.data)
+
+        # 3. If pagination is not enabled, serialize the whole queryset
+        serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 
     def create(self, request):
