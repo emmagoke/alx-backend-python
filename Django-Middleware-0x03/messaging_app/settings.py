@@ -57,7 +57,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # Custom middleware for logging requests
-    'chats.middleware.middleware.RequestLoggingMiddleware',
+    'chats.middleware.RequestLoggingMiddleware',
 ]
 
 ROOT_URLCONF = 'messaging_app.urls'
