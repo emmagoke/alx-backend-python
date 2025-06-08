@@ -6,6 +6,8 @@ from django.db.models import Prefetch
 import uuid
 from rest_framework import filters
 
+from .permissions import IsParticipantOfConversation
+
 
 from .models import Conversation, Message, User
 from .serializers import (
@@ -72,7 +74,9 @@ class ConversationViewSet(viewsets.ViewSet):
             Prefetch('messages', queryset=Message.objects.order_by('-sent_at')) # For latest_message in serializer
         ).distinct()
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response({
+            "data": serializer.data,
+            })
 
     def create(self, request):
         """
@@ -94,7 +98,7 @@ class MessageViewSet(viewsets.ViewSet):
     ViewSet for listing and sending messages using viewsets.ViewSet.
     """
     serializer_class = ChatMessageSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsParticipantOfConversation]
     filter_backends = [filters.OrderingFilter]
 
     def get_serializer_context(self):
