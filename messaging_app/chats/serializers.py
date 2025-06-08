@@ -114,7 +114,9 @@ class ChatConversationSerializer(serializers.ModelSerializer):
             'participant_ids',      # For writing/updating participant UUIDs
             'created_at',
             'updated_at',
-            'latest_message',
+            # 'latest_message',
+            'display_name',
+            'conversation_type',
         )
         read_only_fields = ('conversation_id', 'created_at', 'updated_at', 'latest_message')
     
