@@ -8,8 +8,36 @@ from rest_framework import filters
 
 
 from .models import Conversation, Message, User
-from .serializers import ChatConversationSerializer, ChatMessageSerializer
+from .serializers import (
+    ChatConversationSerializer, ChatMessageSerializer, UserSerializer
+)
 # Create your views here.
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or created.
+    
+    - 'create': Anyone can create a new user (public registration).
+    - 'list': Only admin users can list all users.
+    - 'retrieve', 'update', 'partial_update', 'destroy': Only admin users.
+    """
+    queryset = User.objects.all().order_by('-date_joined')
+    serializer_class = UserSerializer
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        # Allow anyone to create a new user (POST action)
+        if self.action == 'create':
+            permission_classes = [permissions.AllowAny]
+        # For all other actions (list, retrieve, etc.), require admin privileges
+        else:
+            permission_classes = [permissions.IsAdminUser]
+        
+        return [permission() for permission in permission_classes]
+
 
 class ConversationViewSet(viewsets.ViewSet):
     """
