@@ -7,12 +7,26 @@ class UserSerializer(serializers.ModelSerializer):
     """
     UserSerializer, reflecting UUID primary key and other fields.
     """
+    password = serializers.CharField(
+        write_only=True,  # <--- THIS IS THE KEY
+        required=True,
+        # style={'input_type': 'password'}
+    )
     class Meta:
         model = User
         fields = (
             'user_id', 'username', 'email', 'first_name', 'last_name',
-            'role', 'phone_number',
+            'role', 'phone_number', 'password'
         )
+        read_only_fields = ('user_id', 'role')
+    
+    def create(self, validated_data):
+        """
+        Override the default create method to handle password hashing.
+        """
+        # Hash the password before saving the user instance.
+        validated_data['password'] = make_password(validated_data.get('password'))
+        return super().create(validated_data)
 
 
 class ChatMessageSerializer(serializers.ModelSerializer):
