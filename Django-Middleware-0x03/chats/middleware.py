@@ -51,3 +51,34 @@ class RequestLoggingMiddleware:
         # response = self.get_response(request)
 
         return response
+
+
+class RestrictAccessByTimeMiddleware:
+    """
+    Middleware to restrict access to the application outside of specified hours.
+    """
+
+    def __init__(self, get_response):
+        """
+        One-time configuration and initialization for the middleware.
+        """
+        self.get_response = get_response
+    
+    def __call__(self, request):
+        """
+        This method is called for each request.
+        It checks the current time and denies access if it's outside business hours.
+        """
+        # Define the allowed time window (9 AM to 6 PM)
+        start_hour = 9  # 9:00 AM
+        end_hour = 18  # 6:00 PM (18:00 in 24-hour format)
+        current_hour = datetime.now().hour
+
+        # Check if the current hour is outside the allowed window
+        if not (start_hour <= current_hour < end_hour):
+            # If outside the allowed hours, return a 403 Forbidden response.
+            return HttpResponseForbidden("Access to this service is restricted to between 9 AM and 6 PM.")
+        
+        # If within the allowed hours, continue processing the request.
+        response = self.get_response(request)
+        return response
