@@ -32,6 +32,14 @@ class RequestLoggingMiddleware:
         """
         This method is called for each request.
         """
+        # First, pass the request down the chain to the view.
+        # This will allow DRF's authentication to run and update the request object.
+        response = self.get_response(request)
+
+        # AFTER the view has been processed and the response is on its way back,
+        # request.user will have been correctly set by JWTAuthentication
+
+        # print("Request:  ", request.__dict__.get('user'))
         # Determine the user for the log message.
         # If the user is authenticated, use their username. Otherwise, note that they are anonymous.
         user = request.user if request.user.is_authenticated else 'AnonymousUser'
@@ -39,7 +47,7 @@ class RequestLoggingMiddleware:
         # Log the required information using our configured logger.
         requests_logger.info(f"{datetime.now()} - User: {user} - Path: {request.path}")
 
-        # Continue processing the request by calling the next middleware or view.
-        response = self.get_response(request)
+        # # Continue processing the request by calling the next middleware or view.
+        # response = self.get_response(request)
 
         return response
