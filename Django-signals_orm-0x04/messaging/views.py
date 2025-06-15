@@ -1,7 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
+
+from .models import Message
 
 
 @login_required
@@ -29,3 +31,46 @@ def delete_user_account(request):
         return redirect('home') # Assumes you have a 'home' URL name in your project's root urls.py
 
     return render(request, 'messaging/delete_account_confirm.html')
+
+
+@login_required
+def view_thread(request, pk):
+    """
+    Displays a message and its entire reply thread.
+    Uses a recursive CTE to fetch the whole thread in one query
+    and prefetch_related to optimize access to related objects.
+    """
+    # Get the root message of the thread
+    root_message = get_object_or_404(Message, pk=pk)
+    
+    # A recursive CTE to fetch the entire message thread
+    # This requires PostgreSQL, Oracle, or SQLite 3.25+ with CTE support.
+    thread_cte = Message.objects.filter(pk=root_message.pk).ctes(
+        'thread_cte',
+        initial_term=Message.objects.filter(pk=root_message.pk),
+        recursive_term=lambda cte: Message.objects.filter(parent_message=cte)
+    )
+
+    # Fetch all messages in the thread using the CTE
+    thread_messages = (
+        Message.objects.filter(pk__in=thread_cte)
+        .select_related('sender', 'receiver')
+        .prefetch_related('replies')
+        .order_by('timestamp')
+    )
+    
+    # Structure the messages into a nested dictionary for the template
+    message_map = {msg.pk: msg for msg in thread_messages}
+    for msg in thread_messages:
+        if msg.parent_message_id:
+            parent = message_map.get(msg.parent_message_id)
+            if parent:
+                if not hasattr(parent, 'child_replies'):
+                    parent.child_replies = []
+                parent.child_replies.append(msg)
+
+    # The final list contains only the root-level message for this thread view
+    # The template will recursively render the children
+    display_thread = [msg for msg in thread_messages if msg.pk == root_message.pk]
+
+    return render(request, 'messaging/thread_view.html', {'thread_messages': display_thread})
