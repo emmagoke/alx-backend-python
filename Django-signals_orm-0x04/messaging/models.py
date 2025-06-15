@@ -85,6 +85,7 @@ class Notification(models.Model):
     message = models.ForeignKey(Message, on_delete=models.CASCADE, help_text="The message that this notification is about.")
     created_at = models.DateTimeField(auto_now_add=True, help_text="The date and time the notification was created.")
     is_seen = models.BooleanField(default=False, help_text="Indicates whether the user has seen the notification.")
+    edited_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, help_text="The user who edited the message.")
 
     def __str__(self):
         """
