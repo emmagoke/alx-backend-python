@@ -79,3 +79,13 @@ def view_thread(request, pk):
     display_thread = [msg for msg in thread_messages if msg.pk == root_message.pk]
 
     return render(request, 'messaging/thread_view.html', {'thread_messages': display_thread})
+
+
+@login_required
+def inbox(request):
+    """
+    Displays a user's inbox with a list of their unread messages.
+    Uses the custom manager on the Message model for an optimized query.
+    """
+    unread_messages = Message.unread.unread_for_user(request.user)
+    return render(request, 'messaging/inbox.html', {'unread_messages': unread_messages})
