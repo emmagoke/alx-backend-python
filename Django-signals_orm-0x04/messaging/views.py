@@ -39,9 +39,14 @@ def view_thread(request, pk):
     Displays a message and its entire reply thread.
     Uses a recursive CTE to fetch the whole thread in one query
     and prefetch_related to optimize access to related objects.
+    Ensures the requesting user is part of the conversation.
     """
-    # Get the root message of the thread
-    root_message = get_object_or_404(Message, pk=pk)
+    # Get the root message of the thread, ensuring the current user is a participant.
+    root_message = get_object_or_404(
+        Message, 
+        Q(pk=pk),
+        Q(sender=request.user) | Q(receiver=request.user)
+    )
     
     # A recursive CTE to fetch the entire message thread
     # This requires PostgreSQL, Oracle, or SQLite 3.25+ with CTE support.
