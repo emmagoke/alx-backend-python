@@ -64,6 +64,16 @@ class Message(models.Model):
     is_read = models.BooleanField(default=False, help_text="Indicates whether the receiver has read the message.")
     is_edited = models.BooleanField(default=False, help_text="Indicates whether the message has been edited.")
 
+    # Self-referential key for threaded conversations
+    parent_message = models.ForeignKey(
+        'self', 
+        on_delete=models.CASCADE, 
+        null=True, 
+        blank=True, 
+        related_name='replies',
+        help_text="The message to which this is a reply, forming a thread."
+    )
+
     def __str__(self):
         """
         Returns a string representation of the message, useful for the admin interface.
