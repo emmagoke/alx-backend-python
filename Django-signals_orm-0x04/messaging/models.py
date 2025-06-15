@@ -4,6 +4,7 @@ from django.contrib.auth.models import (
 )
 import uuid
 
+from .managers import UnreadMessagesManager
 # Create your models here.
 
 
@@ -73,6 +74,10 @@ class Message(models.Model):
         related_name='replies',
         help_text="The message to which this is a reply, forming a thread."
     )
+
+    # Managers
+    objects = models.Manager()  # The default manager.
+    unread = UnreadMessagesManager()  # The custom unread manager.
 
     def __str__(self):
         """
