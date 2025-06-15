@@ -1,6 +1,6 @@
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
-from .models import Message, Notification, MessageHistory
+from .models import Message, Notification, MessageHistory, User
 
 
 @receiver(post_save, sender=Message)
@@ -56,3 +56,24 @@ def log_message_edit_history(sender, instance, **kwargs):
         except Message.DoesNotExist:
             # This case should not happen for an existing instance, but we handle it just in case.
             pass
+
+
+@receiver(post_delete, sender=User)
+def delete_user_related_data(sender, instance, **kwargs):
+    """
+    A signal that triggers after a User instance is deleted.
+
+    This function cleans up any remaining data associated with the user.
+    Note: Deletion of Message and Notification objects where the user is
+    the sender, receiver, or recipient is handled automatically by the
+    database's `ON DELETE CASCADE` behavior, as defined in the models.
+    
+    This signal specifically cleans up MessageHistory records where the
+    deleted user was the editor, which uses `ON DELETE SET NULL`.
+    """
+    user = instance
+    
+    # Clean up MessageHistory where the deleted user was the editor.
+    MessageHistory.objects.filter(edited_by=user).delete()
+    
+    print(f"Cleaned up all remaining data for deleted user {user.username}.")
