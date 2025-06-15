@@ -62,12 +62,14 @@ class Message(models.Model):
     content = models.TextField(help_text="The text content of the message.")
     timestamp = models.DateTimeField(auto_now_add=True, help_text="The date and time the message was created.")
     is_read = models.BooleanField(default=False, help_text="Indicates whether the receiver has read the message.")
+    is_edited = models.BooleanField(default=False, help_text="Indicates whether the message has been edited.")
 
     def __str__(self):
         """
         Returns a string representation of the message, useful for the admin interface.
         """
-        return f"From {self.sender.username} to {self.receiver.username} at {self.timestamp:%Y-%m-%d %H:%M}"
+        edited_status = "(edited)" if self.is_edited else ""
+        return f"From {self.sender.username} to {self.receiver.username} at {self.timestamp:%Y-%m-%d %H:%M} {edited_status}"
 
     class Meta:
         ordering = ['-timestamp']
@@ -94,3 +96,20 @@ class Notification(models.Model):
         ordering = ['-created_at']
         verbose_name = "Notification"
         verbose_name_plural = "Notifications"
+
+
+class MessageHistory(models.Model):
+    """
+    Stores the previous content of an edited message to maintain a version history.
+    """
+    message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='history', help_text="The message that was edited.")
+    old_content = models.TextField(help_text="The content of the message before it was edited.")
+    edited_at = models.DateTimeField(auto_now_add=True, help_text="The date and time the edit occurred.")
+
+    def __str__(self):
+        return f"History for message ID {self.message.id} at {self.edited_at:%Y-%m-%d %H:%M}"
+
+    class Meta:
+        ordering = ['-edited_at']
+        verbose_name = "Message History"
+        verbose_name_plural = "Message Histories"
