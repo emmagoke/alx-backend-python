@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
+from django.views.decorators.cache import cache_page
 
 from .models import Message
 
@@ -81,11 +82,13 @@ def view_thread(request, pk):
     return render(request, 'messaging/thread_view.html', {'thread_messages': display_thread})
 
 
+@cache_page(60)
 @login_required
 def inbox(request):
     """
     Displays a user's inbox with a list of their unread messages.
     Uses the custom manager on the Message model for an optimized query.
+    This view is cached for 60 seconds.
     """
     unread_messages = Message.unread.unread_for_user(request.user)
     return render(request, 'messaging/inbox.html', {'unread_messages': unread_messages})
