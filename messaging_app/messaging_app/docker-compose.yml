@@ -37,3 +37,7 @@ services:
     # Ensures the 'db' service starts before the 'web' service
     depends_on:
       - db
+
+# Docker volume for persisting MySQL data
+volumes:
+  mysql_data:
