@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # MySQL Database Service
+  db:
+    image: mysql:5.7
+    restart: always
+    # Environment variables are loaded from the .env file in the root directory
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    # Persist database data
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # Django Web Service
+  web:
+    build: .
+    # Command to run migrations and then start the server
+    command: >
+      sh -c "python manage.py migrate && 
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      # Mounts the current directory into the container
+      - .:/app
+    ports:
+      # Maps port 8000 on the host to port 8000 on the container
+      - "8000:8000"
+    # Environment variables passed to the Django container
+    environment:
+      - DB_HOST=db
+      - DB_NAME=${MYSQL_DATABASE}
+      - DB_USER=${MYSQL_USER}
+      - DB_PASS=${MYSQL_PASSWORD}
+    # Ensures the 'db' service starts before the 'web' service
+    depends_on:
+      - db
