@@ -1,0 +1,74 @@
+#!/bin/bash
+
+# A script to orchestrate a blue-green deployment in Kubernetes.
+
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+echo "--- Blue-Green Deployment Script ---"
+echo ""
+
+# --- Step 1: Deploy the Blue (current) version ---
+echo "Step 1: Deploying the 'blue' version and the service..."
+kubectl apply -f blue_deployment.yaml
+kubectl apply -f kubeservice.yaml
+echo "✅ 'blue' deployment and service created."
+echo "Waiting for 'blue' pods to be ready..."
+kubectl rollout status deployment/messaging-app-blue
+echo ""
+echo "-------------------------------------"
+echo ""
+
+
+# --- Step 2: Deploy the Green (new) version ---
+echo "Step 2: Deploying the 'green' (new) version..."
+read -p "Press [Enter] to deploy the 'green' version..."
+kubectl apply -f green_deployment.yaml
+echo "✅ 'green' deployment created."
+echo "Waiting for 'green' pods to be ready..."
+kubectl rollout status deployment/messaging-app-green
+echo ""
+echo "-------------------------------------"
+echo ""
+
+# --- Step 3: Verify the Green version ---
+echo "Step 3: Checking logs for the new 'green' version..."
+# Get the name of one of the green pods
+GREEN_POD=$(kubectl get pods -l app=messaging-app,version=green -o jsonpath='{.items[0].metadata.name}')
+
+if [ -z "$GREEN_POD" ]; then
+  echo "Error: Could not find any 'green' pods."
+  exit 1
+fi
+
+echo "Displaying logs for pod: ${GREEN_POD}"
+kubectl logs --tail=50 $GREEN_POD
+
+echo ""
+echo "✅ Log check complete. Review for any errors."
+echo "At this point, traffic is still directed to the 'blue' version."
+echo ""
+echo "-------------------------------------"
+echo ""
+
+# --- Step 4: Switch traffic to the Green version ---
+echo "Step 4: Switching traffic to the 'green' version..."
+read -p "Press [Enter] to switch live traffic to the 'green' deployment..."
+
+# Use kubectl patch to update the service's selector
+kubectl patch service messaging-app-service -p '{"spec":{"selector":{"version":"green"}}}'
+
+echo ""
+echo "✅ Traffic has been switched to the 'green' version!"
+echo "You can verify by checking the service's selector: kubectl get svc messaging-app-service -o yaml"
+echo ""
+echo "-------------------------------------"
+echo ""
+
+# --- Step 5: (Optional) Tear down the Blue version ---
+echo "Step 5: Tearing down the old 'blue' deployment..."
+read -p "Press [Enter] to delete the old 'blue' deployment..."
+kubectl delete deployment messaging-app-blue
+echo "✅ 'blue' deployment deleted."
+echo ""
+echo "--- Script finished ---"
