@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# A script to start and verify a local Kubernetes cluster using Minikube.
+# It ensures Minikube is installed, starts the cluster, and checks its status.
+
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+echo "--- Kubernetes Local Setup Script ---"
+echo ""
+
+# 1. Check if minikube is installed
+echo "Step 1: Checking for Minikube installation..."
+if ! command -v minikube &> /dev/null
+then
+    echo "Error: minikube could not be found."
+    echo "Please install Minikube before running this script."
+    echo "Installation guide: https://minikube.sigs.k8s.io/docs/start/"
+    exit 1
+else
+    echo "✅ Minikube is installed."
+fi
+
+echo ""
+echo "-------------------------------------"
+echo ""
+
+# 2. Start the Kubernetes cluster
+echo "Step 2: Starting the Minikube cluster..."
+echo "This may take a few minutes..."
+minikube start
+
+echo ""
+echo "✅ Minikube cluster started successfully."
+echo ""
+echo "-------------------------------------"
+echo ""
+
+
+# 3. Verify the cluster is running
+echo "Step 3: Verifying cluster information..."
+kubectl cluster-info
+
+echo ""
+echo "✅ Cluster is running."
+echo ""
+echo "-------------------------------------"
+echo ""
+
+# 4. Retrieve available pods in all namespaces
+echo "Step 4: Retrieving all available pods..."
+kubectl get pods --all-namespaces
+
+echo ""
+echo "--- Script finished ---"
