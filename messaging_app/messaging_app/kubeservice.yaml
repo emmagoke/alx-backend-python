@@ -1,0 +1,18 @@
+# kubeservice.yaml
+# This service directs traffic to either the blue or green deployment.
+# We switch traffic by changing the 'version' selector.
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: messaging-app-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+  selector:
+    app: messaging-app
+    # Initially, traffic goes to the 'blue' version.
+    version: blue
