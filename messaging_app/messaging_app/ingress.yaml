@@ -1,0 +1,27 @@
+# ingress.yaml
+# This file defines the rules for routing external HTTP traffic to your service.
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: messaging-app-ingress
+  annotations:
+    # This annotation is important. It tells Nginx to rewrite the URL.
+    # For example, a request to /api/messages will be sent to your service as /messages.
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    # You can define multiple hosts, but for local testing, we'll omit the host
+    # to accept traffic on any hostname directed at the Ingress controller's IP.
+    - http:
+        paths:
+          # This rule matches any request that starts with /api/
+          - path: /api(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                # This must match the name of your Django app's service.
+                name: messaging-app-service
+                port:
+                  # The port number your service is exposed on.
+                  number: 8000
