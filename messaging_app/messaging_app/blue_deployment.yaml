@@ -1,0 +1,32 @@
+# blue_deployment.yaml
+# This deployment will be updated to trigger a rolling update.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # A standard name for the deployment
+  name: messaging-app-deployment
+spec:
+  replicas: 3
+  # The strategy for replacing old pods with new ones
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      # During the update, at most 1 pod can be unavailable.
+      maxUnavailable: 1
+      # During the update, at most 1 extra pod can be created.
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: messaging-app
+  template:
+    metadata:
+      labels:
+        app: messaging-app
+    spec:
+      containers:
+        - name: messaging-app-container
+          # The image has been updated to the new version: 2.0
+          image: emmagoke/messaging-app:2.0
+          ports:
+            - containerPort: 8000
