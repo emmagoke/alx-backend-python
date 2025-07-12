@@ -1,0 +1,25 @@
+# green_deployment.yaml
+# This is the deployment for the "green" (new) version of the application.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: messaging-app-green
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: messaging-app
+      version: green
+  template:
+    metadata:
+      labels:
+        app: messaging-app
+        version: green
+    spec:
+      containers:
+        - name: messaging-app-container
+          # The image for the new version of your app
+          image: emmagoke/messaging-app:v2
+          ports:
+            - containerPort: 8000
