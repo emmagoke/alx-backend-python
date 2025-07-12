@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# A script to perform and monitor a zero-downtime rolling update.
+
+# --- Configuration ---
+DEPLOYMENT_NAME="messaging-app-deployment"
+SERVICE_NAME="messaging-app-service" # Assumes a service targeting app: messaging-app exists
+LOCAL_PORT="8081"
+REMOTE_PORT="8000"
+
+# --- Helper function to check for downtime ---
+# This function will run in the background, continuously sending requests.
+downtime_checker() {
+    echo "[Monitor] Starting health checks..."
+    while true; do
+        # Send a silent request and get the HTTP status code
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${LOCAL_PORT})
+        if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "[Monitor] DOWNTIME DETECTED! Received status: $HTTP_CODE at $(date)"
+        else
+            # Print a dot for every successful request to show it's working
+            echo -n "."
+        fi
+        sleep 0.5 # Check every half second
+    done
+}
+
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+echo "--- Rolling Update & Downtime Monitoring Script ---"
+echo ""
+echo "This script will trigger a rolling update and monitor for downtime."
+echo "Prerequisite: A deployment named '${DEPLOYMENT_NAME}' (v1) and a service"
+echo "named '${SERVICE_NAME}' must already be running in the cluster."
+echo ""
+echo "Please ensure 'blue_deployment.yaml' is updated with the new image version (e.g., 2.0)."
+echo ""
+read -p "Press [Enter] to begin the rolling update..."
+
+# --- Step 1: Start monitoring in the background ---
+echo ""
+echo "Step 1: Starting port-forwarding and downtime monitor..."
+
+# Start port-forwarding in the background
+kubectl port-forward service/${SERVICE_NAME} ${LOCAL_PORT}:${REMOTE_PORT} &
+PORT_FORWARD_PID=$!
+# Give it a moment to connect
+sleep 3
+
+# Start the downtime checker function in the background
+downtime_checker &
+CHECKER_PID=$!
+echo ""
+echo "[Monitor] Health check process started (PID: ${CHECKER_PID})."
+echo ""
+echo "-------------------------------------"
+echo ""
+
+# --- Step 2: Apply the update ---
+echo "Step 2: Applying the updated deployment to trigger the rolling update..."
+kubectl apply -f blue_deployment.yaml
+
+echo ""
+echo "Update applied. Monitoring rollout status..."
+echo "You will see dots (.) below for every successful request during the update."
+echo ""
+
+# --- Step 3: Monitor the rollout progress ---
+kubectl rollout status deployment/${DEPLOYMENT_NAME}
+
+echo ""
+echo "✅ Rolling update complete!"
+echo ""
+echo "-------------------------------------"
+echo ""
+
+# --- Step 4: Stop the monitoring ---
+echo "Step 4: Stopping background monitoring processes..."
+kill $CHECKER_PID
+kill $PORT_FORWARD_PID
+wait $PORT_FORWARD_PID 2>/dev/null # Suppress "Terminated" message
+echo "✅ Monitoring stopped."
+echo ""
+echo "-------------------------------------"
+echo ""
+
+# --- Step 5: Verify the final state ---
+echo "Step 5: Verifying the new pods and image version..."
+echo ""
+echo "Current Pods:"
+kubectl get pods -l app=messaging-app
+echo ""
+echo "Deployment Image Version:"
+kubectl describe deployment ${DEPLOYMENT_NAME} | grep "Image:"
+
+echo ""
+echo "--- Script finished ---"
