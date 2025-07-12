@@ -1,0 +1,109 @@
+#!/bin/bash
+
+# A script to scale a Kubernetes deployment, verify the change,
+# perform load testing, and monitor resource usage.
+
+# --- Configuration ---
+# IMPORTANT: Change these variables to match your deployment's configuration.
+DEPLOYMENT_NAME="messaging-app-deployment"
+SERVICE_NAME="messaging-app-service"
+APP_LABEL="messaging-app"
+NAMESPACE="default"
+LOCAL_PORT="8080"
+REMOTE_PORT="8000"
+REPLICA_COUNT=3
+
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
+echo "--- Kubernetes Scaling & Testing Script ---"
+echo ""
+
+# --- Prerequisite Checks ---
+echo "Step 1: Checking for prerequisites..."
+
+# Check for kubectl
+if ! command -v kubectl &> /dev/null; then
+    echo "Error: kubectl could not be found. Please install it first."
+    exit 1
+fi
+
+# Check for wrk
+if ! command -v wrk &> /dev/null; then
+    echo "Error: wrk could not be found."
+    echo "Please install wrk to perform load testing."
+    echo "On macOS: brew install wrk"
+    echo "On Debian/Ubuntu: sudo apt-get install wrk"
+    exit 1
+fi
+
+echo "✅ Prerequisites are satisfied."
+echo ""
+echo "-------------------------------------"
+echo ""
+
+# --- Scale the Deployment ---
+echo "Step 2: Scaling deployment '${DEPLOYMENT_NAME}' to ${REPLICA_COUNT} replicas..."
+kubectl scale deployment/${DEPLOYMENT_NAME} --replicas=${REPLICA_COUNT} --namespace=${NAMESPACE}
+
+echo ""
+echo "✅ Scale command issued. Waiting for pods to become ready..."
+# Wait for the deployment to complete the rollout
+kubectl rollout status deployment/${DEPLOYMENT_NAME} --namespace=${NAMESPACE}
+echo ""
+echo "-------------------------------------"
+echo ""
+
+# --- Verify Pods ---
+echo "Step 3: Verifying that ${REPLICA_COUNT} pods are running..."
+kubectl get pods --namespace=${NAMESPACE} -l app=${APP_LABEL}
+
+echo ""
+echo "✅ Verification complete."
+echo ""
+echo "-------------------------------------"
+echo ""
+
+# --- Load Testing ---
+echo "Step 4: Performing load testing with wrk..."
+echo "Note: This will forward a local port to the service within the cluster."
+
+# Start port-forwarding in the background
+kubectl port-forward --namespace=${NAMESPACE} service/${SERVICE_NAME} ${LOCAL_PORT}:${REMOTE_PORT} &
+# Get the process ID of the port-forward command
+PORT_FORWARD_PID=$!
+
+# Give port-forward a moment to establish the connection
+sleep 3
+
+echo "Running wrk for 30 seconds..."
+# Run wrk against the local port
+# -t4: 4 threads
+# -c100: 100 connections
+# -d30s: 30 seconds duration
+wrk -t4 -c100 -d30s http://localhost:${LOCAL_PORT}
+
+# Stop the port-forwarding process
+echo "Stopping port-forward..."
+kill $PORT_FORWARD_PID
+wait $PORT_FORWARD_PID 2>/dev/null
+
+echo ""
+echo "✅ Load testing finished."
+echo ""
+echo "-------------------------------------"
+echo ""
+
+# --- Monitor Resource Usage ---
+echo "Step 5: Monitoring resource usage..."
+echo "Note: This requires the Kubernetes Metrics Server to be installed in your cluster."
+
+echo "--- Node Resource Usage ---"
+kubectl top nodes
+
+echo ""
+echo "--- Pod Resource Usage for '${APP_LABEL}' ---"
+kubectl top pods --namespace=${NAMESPACE} -l app=${APP_LABEL}
+
+echo ""
+echo "--- Script finished ---"
